@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button, Form, Input, Popover } from "antd";
+import throttle from "lodash/throttle";
 
 const BOTTOM_MARGIN = 30;
 const ARROW_HEIGHT = 16;
@@ -27,11 +28,14 @@ export default function ResponsiveFormPopover() {
       setContentMaxHeight(`${available}px`);
     };
 
+    const debouncedUpdate = throttle(update, 100);
+
     update();
-    window.addEventListener("resize", update);
+    window.addEventListener("resize", debouncedUpdate);
 
     return () => {
-      window.removeEventListener("resize", update);
+      window.removeEventListener("resize", debouncedUpdate);
+      debouncedUpdate.cancel();
     };
   }, [open]);
 
